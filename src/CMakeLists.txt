@@ -78,6 +78,8 @@ set(
   distance/capsule_plane.cpp
   distance/cone_halfspace.cpp
   distance/cone_plane.cpp
+  distance/truncated_cone_halfspace.cpp
+  distance/truncated_cone_plane.cpp
   distance/cylinder_halfspace.cpp
   distance/cylinder_plane.cpp
   distance/sphere_sphere.cpp

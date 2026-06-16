@@ -101,9 +101,9 @@ class COAL_DLLAPI ShapeBase : public CollisionGeometry {
   /// \brief Radius of the sphere swept around the shape.
   /// Default value is 0.
   /// Note: this property differs from `inflated` method of certain
-  /// derived classes (e.g. Box, Sphere, Ellipsoid, Capsule, Cone, Cylinder)
-  /// in the sense that inflated returns a new shape which can be inflated but
-  /// also deflated.
+  /// derived classes (e.g. Box, Sphere, Ellipsoid, Capsule, Cone,
+  /// TruncatedCone, Cylinder) in the sense that inflated returns a new shape
+  /// which can be inflated but also deflated.
   /// Also, an inflated shape is not rounded. It simply has a different size.
   /// Sweeping a shape with a sphere is a different operation (a Minkowski sum),
   /// which rounds the sharp corners of a shape.
@@ -572,6 +572,138 @@ class COAL_DLLAPI Cone : public ShapeBase {
 
     COAL_EQUAL_OPERATOR_CHECK(ShapeBase::isEqual(other));
     COAL_EQUAL_OPERATOR_CHECK(radius == other.radius);
+    COAL_EQUAL_OPERATOR_CHECK(halfLength == other.halfLength);
+
+    return true;
+  }
+
+ public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+};
+
+/// @brief Truncated cone along Z axis.
+/// The bottom circle is at \f$ z = - halfLength \f$ and the top circle is at
+/// \f$ z = halfLength \f$.
+class COAL_DLLAPI TruncatedCone : public ShapeBase {
+ public:
+  /// @brief Default constructor
+  TruncatedCone() {}
+
+  TruncatedCone(Scalar bottom_radius_, Scalar top_radius_, Scalar lz_)
+      : ShapeBase(),
+        bottomRadius(bottom_radius_),
+        topRadius(top_radius_),
+        halfLength(lz_ / 2) {}
+
+  TruncatedCone(const TruncatedCone& other)
+      : ShapeBase(other),
+        bottomRadius(other.bottomRadius),
+        topRadius(other.topRadius),
+        halfLength(other.halfLength) {}
+
+  TruncatedCone& operator=(const TruncatedCone& other) {
+    if (this == &other) return *this;
+
+    this->bottomRadius = other.bottomRadius;
+    this->topRadius = other.topRadius;
+    this->halfLength = other.halfLength;
+    return *this;
+  }
+
+  /// @brief Clone *this into a new TruncatedCone
+  virtual TruncatedCone* clone() const override {
+    return new TruncatedCone(*this);
+  };
+
+  /// @brief Radius at z = -halfLength
+  Scalar bottomRadius;
+
+  /// @brief Radius at z = halfLength
+  Scalar topRadius;
+
+  /// @brief Half Length along z axis
+  Scalar halfLength;
+
+  /// @brief Compute AABB
+  void computeLocalAABB() override;
+
+  /// @brief Get node type: a truncated cone
+  NODE_TYPE getNodeType() const override { return GEOM_TRUNCATED_CONE; }
+
+  Scalar computeVolume() const override {
+    const Scalar rb2 = bottomRadius * bottomRadius;
+    const Scalar rt2 = topRadius * topRadius;
+    return boost::math::constants::pi<Scalar>() * (2 * halfLength) *
+           (rb2 + bottomRadius * topRadius + rt2) / 3;
+  }
+
+  Matrix3s computeMomentofInertia() const override {
+    const Scalar rb = bottomRadius;
+    const Scalar rt = topRadius;
+    const Scalar H = 2 * halfLength;
+    const Scalar rb2 = rb * rb;
+    const Scalar rt2 = rt * rt;
+    const Scalar s4 =
+        rb2 * rb2 + rb2 * rb * rt + rb2 * rt2 + rb * rt2 * rt + rt2 * rt2;
+    const Scalar pi = boost::math::constants::pi<Scalar>();
+
+    const Scalar ix =
+        pi * H * s4 / 20 + pi * H * H * H * (2 * rb2 + rb * rt + 2 * rt2) / 60;
+    const Scalar iz = pi * H * s4 / 10;
+
+    return (Matrix3s() << ix, 0, 0, 0, ix, 0, 0, 0, iz).finished();
+  }
+
+  Vec3s computeCOM() const override {
+    const Scalar rb2 = bottomRadius * bottomRadius;
+    const Scalar rt2 = topRadius * topRadius;
+    const Scalar denom = rb2 + bottomRadius * topRadius + rt2;
+    if (denom == 0) return Vec3s::Zero();
+    return Vec3s(0, 0, halfLength * (rt2 - rb2) / (2 * denom));
+  }
+
+  Scalar minInflationValue() const {
+    const Scalar slope = (topRadius - bottomRadius) / (2 * halfLength);
+    const Scalar side_scale = std::sqrt(1 + slope * slope);
+    return (std::max)(-halfLength,
+                      (std::max)(-bottomRadius / (side_scale - slope),
+                                 -topRadius / (side_scale + slope)));
+  }
+
+  /// \brief Inflate the truncated cone by an amount given by `value`.
+  /// This value can be positive or negative but must always >=
+  /// `minInflationValue()`.
+  ///
+  /// \param[in] value of the shape inflation.
+  ///
+  /// \returns a new inflated truncated cone and the related transform to
+  /// account for the change of shape frame
+  std::pair<TruncatedCone, Transform3s> inflated(const Scalar value) const {
+    if (value <= minInflationValue())
+      COAL_THROW_PRETTY("value (" << value
+                                  << ") is two small. It should be at least: "
+                                  << minInflationValue(),
+                        std::invalid_argument);
+
+    const Scalar slope = (topRadius - bottomRadius) / (2 * halfLength);
+    const Scalar side_scale = std::sqrt(1 + slope * slope);
+    return std::make_pair(
+        TruncatedCone(bottomRadius + value * (side_scale - slope),
+                      topRadius + value * (side_scale + slope),
+                      2 * (halfLength + value)),
+        Transform3s());
+  }
+
+ private:
+  virtual bool isEqual(const CollisionGeometry& _other) const override {
+    const TruncatedCone* other_ptr =
+        dynamic_cast<const TruncatedCone*>(&_other);
+    if (other_ptr == nullptr) return false;
+    const TruncatedCone& other = *other_ptr;
+
+    COAL_EQUAL_OPERATOR_CHECK(ShapeBase::isEqual(other));
+    COAL_EQUAL_OPERATOR_CHECK(bottomRadius == other.bottomRadius);
+    COAL_EQUAL_OPERATOR_CHECK(topRadius == other.topRadius);
     COAL_EQUAL_OPERATOR_CHECK(halfLength == other.halfLength);
 
     return true;

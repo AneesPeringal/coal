@@ -95,6 +95,12 @@ template <int _SupportOptions = SupportOptions::NoSweptSphere>
 void getShapeSupport(const Cone* cone, const Vec3s& dir, Vec3s& support,
                      int& /*unused*/, ShapeSupportData& /*unused*/);
 
+/// @brief Truncated cone support function.
+template <int _SupportOptions = SupportOptions::NoSweptSphere>
+void getShapeSupport(const TruncatedCone* truncated_cone, const Vec3s& dir,
+                     Vec3s& support, int& /*unused*/,
+                     ShapeSupportData& /*unused*/);
+
 /// @brief Cylinder support function.
 template <int _SupportOptions = SupportOptions::NoSweptSphere>
 void getShapeSupport(const Cylinder* cylinder, const Vec3s& dir, Vec3s& support,
@@ -241,6 +247,15 @@ void getShapeSupportSet(const Capsule* capsule, SupportSet& support_set,
 template <int _SupportOptions = SupportOptions::NoSweptSphere>
 void getShapeSupportSet(const Cone* cone, SupportSet& support_set,
                         int& /*unused*/, ShapeSupportData& /*unused*/,
+                        size_t num_sampled_supports = 6,
+                        Scalar tol = Scalar(1e-3));
+
+/// @brief Truncated cone support set function.
+/// Assumes the support set frame has already been computed.
+template <int _SupportOptions = SupportOptions::NoSweptSphere>
+void getShapeSupportSet(const TruncatedCone* truncated_cone,
+                        SupportSet& support_set, int& /*unused*/,
+                        ShapeSupportData& /*unused*/,
                         size_t num_sampled_supports = 6,
                         Scalar tol = Scalar(1e-3));
 

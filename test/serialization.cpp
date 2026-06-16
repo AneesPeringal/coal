@@ -537,6 +537,14 @@ BOOST_AUTO_TEST_CASE(test_shapes) {
   }
 
   {
+    TruncatedCone truncated_cone(1., 0.5, 2.),
+        truncated_cone_copy(10., 10., 10.);
+    truncated_cone.setSweptSphereRadius(1.);
+    truncated_cone.computeLocalAABB();
+    test_serialization(truncated_cone, truncated_cone_copy);
+  }
+
+  {
     Cylinder cylinder(1., 2.), cylinder_copy(10., 10.);
     cylinder.setSweptSphereRadius(1.);
     cylinder.computeLocalAABB();

@@ -121,6 +121,17 @@ struct shape_traits<Cone> : shape_traits_base {
 };
 
 template <>
+struct shape_traits<TruncatedCone> : shape_traits_base {
+  enum {
+    NeedNormalizedDir = false,
+    NeedNesterovNormalizeHeuristic = false,
+    IsInflatable = true,
+    HasInflatedSupportFunction = false,
+    IsStrictlyConvex = false
+  };
+};
+
+template <>
 struct shape_traits<Cylinder> : shape_traits_base {
   enum {
     NeedNormalizedDir = false,

@@ -154,6 +154,54 @@ class TestGeometricShapes(TestCase):
         Ic_ref = np.diag([Icx_ref, Icx_ref, Iz_ref])
         self.assertApprox(Ic, Ic_ref)
 
+    def test_truncated_cone(self):
+        truncated_cone = coal.TruncatedCone(1.0, 0.5, 2.0)
+        self.assertIsInstance(truncated_cone, coal.TruncatedCone)
+        self.assertIsInstance(truncated_cone, coal.ShapeBase)
+        self.assertIsInstance(truncated_cone, coal.CollisionGeometry)
+        self.assertEqual(
+            truncated_cone.getNodeType(), coal.NODE_TYPE.GEOM_TRUNCATED_CONE
+        )
+        self.assertEqual(truncated_cone.bottomRadius, 1.0)
+        self.assertEqual(truncated_cone.topRadius, 0.5)
+        self.assertEqual(truncated_cone.halfLength, 1.0)
+        truncated_cone.bottomRadius = 3.0
+        truncated_cone.topRadius = 2.0
+        truncated_cone.halfLength = 4.0
+        self.assertEqual(truncated_cone.bottomRadius, 3.0)
+        self.assertEqual(truncated_cone.topRadius, 2.0)
+        self.assertEqual(truncated_cone.halfLength, 4.0)
+
+        rb = truncated_cone.bottomRadius
+        rt = truncated_cone.topRadius
+        h = truncated_cone.halfLength
+        H = 2.0 * h
+        denom = rb**2 + rb * rt + rt**2
+        com = truncated_cone.computeCOM()
+        self.assertApprox(
+            com, np.array([0.0, 0.0, h * (rt**2 - rb**2) / (2.0 * denom)])
+        )
+
+        V = truncated_cone.computeVolume()
+        V_ref = np.pi * H * denom / 3.0
+        self.assertApprox(V, V_ref)
+
+        I0 = truncated_cone.computeMomentofInertia()
+        s4 = rb**4 + rb**3 * rt + rb**2 * rt**2 + rb * rt**3 + rt**4
+        Ix_ref = (
+            np.pi * H * s4 / 20.0
+            + np.pi * H**3 * (2.0 * rb**2 + rb * rt + 2.0 * rt**2) / 60.0
+        )
+        Iz_ref = np.pi * H * s4 / 10.0
+        I0_ref = np.diag([Ix_ref, Ix_ref, Iz_ref])
+        self.assertApprox(I0, I0_ref)
+
+        Ic = truncated_cone.computeMomentofInertiaRelatedToCOM()
+        Ic_ref = I0_ref.copy()
+        Ic_ref[0, 0] -= V_ref * com[2] ** 2
+        Ic_ref[1, 1] -= V_ref * com[2] ** 2
+        self.assertApprox(Ic, Ic_ref)
+
     def test_BVH(self):
         bvh = coal.BVHModelOBBRSS()
         self.assertEqual(bvh.num_vertices, 0)

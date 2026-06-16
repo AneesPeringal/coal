@@ -398,6 +398,17 @@ void Cone::computeLocalAABB() {
   aabb_radius = (aabb_local.min_ - aabb_center).norm();
 }
 
+void TruncatedCone::computeLocalAABB() {
+  computeBV<AABB>(*this, Transform3s(), aabb_local);
+  const Scalar ssr = this->getSweptSphereRadius();
+  if (ssr > 0) {
+    aabb_local.min_ -= Vec3s::Constant(ssr);
+    aabb_local.max_ += Vec3s::Constant(ssr);
+  }
+  aabb_center = aabb_local.center();
+  aabb_radius = (aabb_local.min_ - aabb_center).norm();
+}
+
 void Cylinder::computeLocalAABB() {
   computeBV<AABB>(*this, Transform3s(), aabb_local);
   const Scalar ssr = this->getSweptSphereRadius();

@@ -126,6 +126,11 @@ MinkowskiDiff::GetSupportFunction makeGetSupportFunction1(
         return getSupportFuncTpl<Shape0, Cone, true, _SupportOptions>;
       else
         return getSupportFuncTpl<Shape0, Cone, false, _SupportOptions>;
+    case GEOM_TRUNCATED_CONE:
+      if (identity)
+        return getSupportFuncTpl<Shape0, TruncatedCone, true, _SupportOptions>;
+      else
+        return getSupportFuncTpl<Shape0, TruncatedCone, false, _SupportOptions>;
     case GEOM_CYLINDER:
       if (identity)
         return getSupportFuncTpl<Shape0, Cylinder, true, _SupportOptions>;
@@ -225,6 +230,10 @@ MinkowskiDiff::GetSupportFunction makeGetSupportFunction0(
       return makeGetSupportFunction1<Cone, _SupportOptions>(
           s1, identity, swept_sphere_radius, data);
       break;
+    case GEOM_TRUNCATED_CONE:
+      return makeGetSupportFunction1<TruncatedCone, _SupportOptions>(
+          s1, identity, swept_sphere_radius, data);
+      break;
     case GEOM_CYLINDER:
       return makeGetSupportFunction1<Cylinder, _SupportOptions>(
           s1, identity, swept_sphere_radius, data);
@@ -280,6 +289,9 @@ bool getNormalizeSupportDirection(const ShapeBase* shape) {
       break;
     case GEOM_CONE:
       return (bool)shape_traits<Cone>::NeedNesterovNormalizeHeuristic;
+      break;
+    case GEOM_TRUNCATED_CONE:
+      return (bool)shape_traits<TruncatedCone>::NeedNesterovNormalizeHeuristic;
       break;
     case GEOM_CYLINDER:
       return (bool)shape_traits<Cylinder>::NeedNesterovNormalizeHeuristic;

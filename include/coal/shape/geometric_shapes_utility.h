@@ -59,6 +59,8 @@ COAL_DLLAPI std::vector<Vec3s> getBoundVertices(const Capsule& capsule,
                                                 const Transform3s& tf);
 COAL_DLLAPI std::vector<Vec3s> getBoundVertices(const Cone& cone,
                                                 const Transform3s& tf);
+COAL_DLLAPI std::vector<Vec3s> getBoundVertices(
+    const TruncatedCone& truncated_cone, const Transform3s& tf);
 COAL_DLLAPI std::vector<Vec3s> getBoundVertices(const Cylinder& cylinder,
                                                 const Transform3s& tf);
 COAL_DLLAPI std::vector<Vec3s> getBoundVertices(const TriangleP& triangle,
@@ -110,6 +112,11 @@ COAL_DLLAPI void computeBV<AABB, Cone>(const Cone& s, const Transform3s& tf,
                                        AABB& bv);
 
 template <>
+COAL_DLLAPI void computeBV<AABB, TruncatedCone>(const TruncatedCone& s,
+                                                const Transform3s& tf,
+                                                AABB& bv);
+
+template <>
 COAL_DLLAPI void computeBV<AABB, Cylinder>(const Cylinder& s,
                                            const Transform3s& tf, AABB& bv);
 template <>
@@ -147,6 +154,10 @@ COAL_DLLAPI void computeBV<OBB, Capsule>(const Capsule& s,
 template <>
 COAL_DLLAPI void computeBV<OBB, Cone>(const Cone& s, const Transform3s& tf,
                                       OBB& bv);
+
+template <>
+COAL_DLLAPI void computeBV<OBB, TruncatedCone>(const TruncatedCone& s,
+                                               const Transform3s& tf, OBB& bv);
 
 template <>
 COAL_DLLAPI void computeBV<OBB, Cylinder>(const Cylinder& s,

@@ -203,6 +203,9 @@ Capsule makeRandomCapsule(std::array<Scalar, 2> min_size,
 Cone makeRandomCone(std::array<Scalar, 2> min_size,
                     std::array<Scalar, 2> max_size);
 
+TruncatedCone makeRandomTruncatedCone(std::array<Scalar, 3> min_size,
+                                      std::array<Scalar, 3> max_size);
+
 Cylinder makeRandomCylinder(std::array<Scalar, 2> min_size,
                             std::array<Scalar, 2> max_size);
 

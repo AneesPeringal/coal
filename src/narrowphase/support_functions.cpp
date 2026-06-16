@@ -70,6 +70,9 @@ Vec3s getSupport(const ShapeBase* shape, const Vec3s& dir, int& hint) {
     case GEOM_CONE:
       CALL_GET_SHAPE_SUPPORT(Cone);
       break;
+    case GEOM_TRUNCATED_CONE:
+      CALL_GET_SHAPE_SUPPORT(TruncatedCone);
+      break;
     case GEOM_CYLINDER:
       CALL_GET_SHAPE_SUPPORT(Cylinder);
       break;
@@ -262,6 +265,45 @@ void getShapeSupport(const Cone* cone, const Vec3s& dir, Vec3s& support,
   }
 }
 getShapeSupportTplInstantiation(Cone);
+
+// ============================================================================
+template <int _SupportOptions>
+void getShapeSupport(const TruncatedCone* truncated_cone, const Vec3s& dir,
+                     Vec3s& support, int& /*unused*/,
+                     ShapeSupportData& /*unused*/) {
+  static const Scalar dummy_precision =
+      Eigen::NumTraits<Scalar>::dummy_precision();
+  static const Scalar inflate = 1 + Scalar(1e-10);
+
+  const Scalar h = truncated_cone->halfLength;
+  Scalar bottom_radius = truncated_cone->bottomRadius;
+  Scalar top_radius = truncated_cone->topRadius;
+
+  const bool dir_is_aligned_with_z = dir.head<2>().isZero(dummy_precision);
+  if (dir_is_aligned_with_z) {
+    bottom_radius *= inflate;
+    top_radius *= inflate;
+    support.head<2>().setZero();
+  } else {
+    support.head<2>() = dir.head<2>().normalized();
+  }
+
+  const Scalar bottom_value = bottom_radius * dir.head<2>().norm() - h * dir[2];
+  const Scalar top_value = top_radius * dir.head<2>().norm() + h * dir[2];
+
+  if (top_value > bottom_value) {
+    support.head<2>() *= top_radius;
+    support[2] = h;
+  } else {
+    support.head<2>() *= bottom_radius;
+    support[2] = -h;
+  }
+
+  if (_SupportOptions == SupportOptions::WithSweptSphere) {
+    support += truncated_cone->getSweptSphereRadius() * dir.normalized();
+  }
+}
+getShapeSupportTplInstantiation(TruncatedCone);
 
 // ============================================================================
 template <int _SupportOptions>
@@ -478,6 +520,9 @@ void getSupportSet(const ShapeBase* shape, SupportSet& support_set, int& hint,
       break;
     case GEOM_CONE:
       CALL_GET_SHAPE_SUPPORT_SET(Cone);
+      break;
+    case GEOM_TRUNCATED_CONE:
+      CALL_GET_SHAPE_SUPPORT_SET(TruncatedCone);
       break;
     case GEOM_CYLINDER:
       CALL_GET_SHAPE_SUPPORT_SET(Cylinder);
@@ -747,6 +792,59 @@ void getShapeSupportSet(const Cone* cone, SupportSet& support_set,
   }
 }
 getShapeSupportSetTplInstantiation(Cone);
+
+// ============================================================================
+template <int _SupportOptions>
+void getShapeSupportSet(const TruncatedCone* truncated_cone,
+                        SupportSet& support_set, int& hint /*unused*/,
+                        ShapeSupportData& support_data /*unused*/,
+                        size_t num_sampled_supports, Scalar tol) {
+  assert(tol > 0);
+  support_set.points().clear();
+
+  Vec3s support;
+  const Vec3s& support_dir = support_set.getNormal();
+  getShapeSupport<SupportOptions::NoSweptSphere>(truncated_cone, support_dir,
+                                                 support, hint, support_data);
+  const Scalar support_value = support.dot(support_dir);
+  const Scalar radial_norm = support_dir.head<2>().norm();
+
+  const Scalar h = truncated_cone->halfLength;
+  const Scalar radii[2] = {truncated_cone->bottomRadius,
+                           truncated_cone->topRadius};
+  const Scalar z_values[2] = {-h, h};
+
+  if (radial_norm <= Eigen::NumTraits<Scalar>::dummy_precision()) {
+    const size_t cap_id = support_dir[2] > 0 ? 1 : 0;
+    const Scalar r = radii[cap_id];
+    const Scalar z = z_values[cap_id];
+    const Scalar angle_increment =
+        Scalar(2 * EIGEN_PI) / (Scalar(num_sampled_supports));
+    for (size_t i = 0; i < num_sampled_supports; ++i) {
+      const Scalar theta = (Scalar)(i)*angle_increment;
+      Vec3s point_on_cap(r * std::cos(theta), r * std::sin(theta), z);
+      if (_SupportOptions == SupportOptions::WithSweptSphere) {
+        point_on_cap += truncated_cone->getSweptSphereRadius() * support_dir;
+      }
+      support_set.addPoint(point_on_cap);
+    }
+    return;
+  }
+
+  const Vec3s radial_dir(support_dir[0] / radial_norm,
+                         support_dir[1] / radial_norm, 0);
+  for (size_t i = 0; i < 2; ++i) {
+    Vec3s point_on_cap(radii[i] * radial_dir[0], radii[i] * radial_dir[1],
+                       z_values[i]);
+    if (support_value - support_dir.dot(point_on_cap) <= tol) {
+      if (_SupportOptions == SupportOptions::WithSweptSphere) {
+        point_on_cap += truncated_cone->getSweptSphereRadius() * support_dir;
+      }
+      support_set.addPoint(point_on_cap);
+    }
+  }
+}
+getShapeSupportSetTplInstantiation(TruncatedCone);
 
 // ============================================================================
 template <int _SupportOptions>

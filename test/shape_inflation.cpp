@@ -97,6 +97,13 @@ bool isApprox(const Cone& s1, const Cone& s2, const Scalar tol) {
          isApprox(s1.halfLength, s2.halfLength, tol);
 }
 
+bool isApprox(const TruncatedCone& s1, const TruncatedCone& s2,
+              const Scalar tol) {
+  return isApprox(s1.bottomRadius, s2.bottomRadius, tol) &&
+         isApprox(s1.topRadius, s2.topRadius, tol) &&
+         isApprox(s1.halfLength, s2.halfLength, tol);
+}
+
 bool isApprox(const TriangleP& s1, const TriangleP& s2, const Scalar tol) {
   return s1.a.isApprox(s2.a, tol) && s1.b.isApprox(s2.b, tol) &&
          s1.c.isApprox(s2.c, tol);
@@ -188,6 +195,10 @@ BOOST_AUTO_TEST_CASE(test_inflate) {
   const coal::Cone cone(1, 4);
   test(cone, Scalar(0.01), Scalar(1e-8));
   test_throw(cone, Scalar(-1.1));
+
+  const coal::TruncatedCone truncated_cone(1, 0.5, 4);
+  test(truncated_cone, Scalar(0.01), Scalar(1e-8));
+  test_throw(truncated_cone, Scalar(-1.1));
 
   const coal::Halfspace halfspace(Vec3s::UnitZ(), 0);
   test(halfspace, Scalar(0.01), Scalar(1e-8));

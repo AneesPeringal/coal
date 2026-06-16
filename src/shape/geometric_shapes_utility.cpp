@@ -196,6 +196,35 @@ std::vector<Vec3s> getBoundVertices(const Cone& cone, const Transform3s& tf) {
   return result;
 }
 
+std::vector<Vec3s> getBoundVertices(const TruncatedCone& truncated_cone,
+                                    const Transform3s& tf) {
+  std::vector<Vec3s> result(12);
+
+  const Scalar hl = truncated_cone.halfLength;
+  const Scalar rb2 = truncated_cone.bottomRadius * 2 / sqrt(Scalar(3));
+  const Scalar rt2 = truncated_cone.topRadius * 2 / sqrt(Scalar(3));
+  const Scalar ab = Scalar(0.5) * rb2;
+  const Scalar at = Scalar(0.5) * rt2;
+  const Scalar bb = truncated_cone.bottomRadius;
+  const Scalar bt = truncated_cone.topRadius;
+
+  result[0] = tf.transform(Vec3s(rb2, 0, -hl));
+  result[1] = tf.transform(Vec3s(ab, bb, -hl));
+  result[2] = tf.transform(Vec3s(-ab, bb, -hl));
+  result[3] = tf.transform(Vec3s(-rb2, 0, -hl));
+  result[4] = tf.transform(Vec3s(-ab, -bb, -hl));
+  result[5] = tf.transform(Vec3s(ab, -bb, -hl));
+
+  result[6] = tf.transform(Vec3s(rt2, 0, hl));
+  result[7] = tf.transform(Vec3s(at, bt, hl));
+  result[8] = tf.transform(Vec3s(-at, bt, hl));
+  result[9] = tf.transform(Vec3s(-rt2, 0, hl));
+  result[10] = tf.transform(Vec3s(-at, -bt, hl));
+  result[11] = tf.transform(Vec3s(at, -bt, hl));
+
+  return result;
+}
+
 std::vector<Vec3s> getBoundVertices(const Cylinder& cylinder,
                                     const Transform3s& tf) {
   std::vector<Vec3s> result(12);
@@ -328,6 +357,25 @@ void computeBV<AABB, Cone>(const Cone& s, const Transform3s& tf, AABB& bv) {
   Scalar y_range = fabs(R(1, 0) * s.radius) + fabs(R(1, 1) * s.radius) +
                    fabs(R(1, 2) * s.halfLength);
   Scalar z_range = fabs(R(2, 0) * s.radius) + fabs(R(2, 1) * s.radius) +
+                   fabs(R(2, 2) * s.halfLength);
+
+  Vec3s v_delta(x_range, y_range, z_range);
+  bv.max_ = T + v_delta;
+  bv.min_ = T - v_delta;
+}
+
+template <>
+void computeBV<AABB, TruncatedCone>(const TruncatedCone& s,
+                                    const Transform3s& tf, AABB& bv) {
+  const Matrix3s& R = tf.getRotation();
+  const Vec3s& T = tf.getTranslation();
+  const Scalar radius = (std::max)(s.bottomRadius, s.topRadius);
+
+  Scalar x_range = fabs(R(0, 0) * radius) + fabs(R(0, 1) * radius) +
+                   fabs(R(0, 2) * s.halfLength);
+  Scalar y_range = fabs(R(1, 0) * radius) + fabs(R(1, 1) * radius) +
+                   fabs(R(1, 2) * s.halfLength);
+  Scalar z_range = fabs(R(2, 0) * radius) + fabs(R(2, 1) * radius) +
                    fabs(R(2, 2) * s.halfLength);
 
   Vec3s v_delta(x_range, y_range, z_range);
@@ -508,6 +556,22 @@ void computeBV<OBB, Cone>(const Cone& s, const Transform3s& tf, OBB& bv) {
   bv.To.noalias() = T;
   bv.axes.noalias() = R;
   bv.extent << s.radius, s.radius, s.halfLength;
+}
+
+template <>
+void computeBV<OBB, TruncatedCone>(const TruncatedCone& s,
+                                   const Transform3s& tf, OBB& bv) {
+  if (s.getSweptSphereRadius() > 0) {
+    COAL_THROW_PRETTY("Swept-sphere radius not yet supported.",
+                      std::runtime_error);
+  }
+  const Matrix3s& R = tf.getRotation();
+  const Vec3s& T = tf.getTranslation();
+  const Scalar radius = (std::max)(s.bottomRadius, s.topRadius);
+
+  bv.To.noalias() = T;
+  bv.axes.noalias() = R;
+  bv.extent << radius, radius, s.halfLength;
 }
 
 template <>

@@ -40,6 +40,7 @@
 
 #include "coal/shape/geometric_shapes.h"
 #include "coal/BVH/BVH_model.h"
+#include <algorithm>
 #include <boost/math/constants/constants.hpp>
 
 namespace coal {
@@ -347,6 +348,91 @@ void generateBVHModel(BVHModel<BV>& model, const Cone& shape,
 
   Scalar circle_edge = phid * r;
   unsigned int h_num = (unsigned int)ceil(h / circle_edge);
+
+  generateBVHModel(model, shape, pose, tot, h_num);
+}
+
+/// @brief Generate BVH model from truncated cone, given the number of segments
+/// along circle and the number of segments along axis.
+template <typename BV>
+void generateBVHModel(BVHModel<BV>& model, const TruncatedCone& shape,
+                      const Transform3s& pose, unsigned int tot,
+                      unsigned int h_num) {
+  std::vector<Vec3s> points;
+  std::vector<Triangle32> tri_indices;
+
+  const Scalar rb = shape.bottomRadius;
+  const Scalar rt = shape.topRadius;
+  const Scalar h = shape.halfLength;
+
+  const Scalar pi = boost::math::constants::pi<Scalar>();
+  const Scalar phid = pi * 2 / Scalar(tot);
+  const Scalar hd = 2 * h / Scalar(h_num);
+
+  for (unsigned int i = 0; i <= h_num; ++i) {
+    const Scalar z = -h + Scalar(i) * hd;
+    const Scalar alpha = Scalar(i) / Scalar(h_num);
+    const Scalar r = (1 - alpha) * rb + alpha * rt;
+    for (unsigned int j = 0; j < tot; ++j) {
+      const Scalar phi = phid * Scalar(j);
+      points.push_back(Vec3s(r * cos(phi), r * sin(phi), z));
+    }
+  }
+
+  const unsigned int bottom_center = static_cast<unsigned int>(points.size());
+  points.push_back(Vec3s(0, 0, -h));
+  const unsigned int top_center = static_cast<unsigned int>(points.size());
+  points.push_back(Vec3s(0, 0, h));
+
+  for (unsigned int i = 0; i < tot; ++i) {
+    const unsigned int next = (i == tot - 1) ? 0 : (i + 1);
+    tri_indices.push_back(Triangle32(bottom_center, next, i));
+    tri_indices.push_back(
+        Triangle32(top_center, h_num * tot + i, h_num * tot + next));
+  }
+
+  for (unsigned int i = 0; i < h_num; ++i) {
+    const unsigned int start = i * tot;
+    const unsigned int next_start = (i + 1) * tot;
+    for (unsigned int j = 0; j < tot; ++j) {
+      const unsigned int next = (j == tot - 1) ? 0 : (j + 1);
+      tri_indices.push_back(
+          Triangle32(start + j, start + next, next_start + j));
+      tri_indices.push_back(
+          Triangle32(start + next, next_start + next, next_start + j));
+    }
+  }
+
+  for (unsigned int i = 0; i < points.size(); ++i) {
+    points[i] = pose.transform(points[i]);
+  }
+
+  model.beginModel();
+  model.addSubModel(points, tri_indices);
+  model.endModel();
+  model.computeLocalAABB();
+}
+
+/// @brief Generate BVH model from truncated cone.
+/// Difference from generateBVHModel: it gives the circle split number for a
+/// truncated cone with unit maximum radius. For larger radii, the number of
+/// circle splits is max(bottomRadius, topRadius) * tot.
+template <typename BV>
+void generateBVHModel(BVHModel<BV>& model, const TruncatedCone& shape,
+                      const Transform3s& pose,
+                      unsigned int tot_for_unit_truncated_cone) {
+  const Scalar r = (std::max)(shape.bottomRadius, shape.topRadius);
+  const Scalar h = 2 * shape.halfLength;
+
+  const Scalar pi = boost::math::constants::pi<Scalar>();
+  unsigned int tot =
+      (std::max)(3u, (unsigned int)(Scalar(tot_for_unit_truncated_cone) * r));
+  Scalar phid = pi * 2 / Scalar(tot);
+
+  Scalar circle_edge = phid * r;
+  unsigned int h_num =
+      circle_edge > 0 ? (unsigned int)ceil(h / circle_edge) : 1u;
+  h_num = (std::max)(1u, h_num);
 
   generateBVHModel(model, shape, pose, tot, h_num);
 }

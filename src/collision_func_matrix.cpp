@@ -289,6 +289,7 @@ CollisionFunctionMatrix::CollisionFunctionMatrix() {
   collision_matrix[GEOM_BOX][GEOM_SPHERE]                 = &ShapeShapeCollide<Box, Sphere>;
   collision_matrix[GEOM_BOX][GEOM_CAPSULE]                = &ShapeShapeCollide<Box, Capsule>;
   collision_matrix[GEOM_BOX][GEOM_CONE]                   = &ShapeShapeCollide<Box, Cone>;
+  collision_matrix[GEOM_BOX][GEOM_TRUNCATED_CONE]         = &ShapeShapeCollide<Box, TruncatedCone>;
   collision_matrix[GEOM_BOX][GEOM_CYLINDER]               = &ShapeShapeCollide<Box, Cylinder>;
   collision_matrix[GEOM_BOX][GEOM_CONVEX16]               = &ShapeShapeCollide<Box, ConvexBase16>;
   collision_matrix[GEOM_BOX][GEOM_CONVEX32]               = &ShapeShapeCollide<Box, ConvexBase32>;
@@ -301,6 +302,7 @@ CollisionFunctionMatrix::CollisionFunctionMatrix() {
   collision_matrix[GEOM_SPHERE][GEOM_SPHERE]              = &ShapeShapeCollide<Sphere, Sphere>;
   collision_matrix[GEOM_SPHERE][GEOM_CAPSULE]             = &ShapeShapeCollide<Sphere, Capsule>;
   collision_matrix[GEOM_SPHERE][GEOM_CONE]                = &ShapeShapeCollide<Sphere, Cone>;
+  collision_matrix[GEOM_SPHERE][GEOM_TRUNCATED_CONE]      = &ShapeShapeCollide<Sphere, TruncatedCone>;
   collision_matrix[GEOM_SPHERE][GEOM_CYLINDER]            = &ShapeShapeCollide<Sphere, Cylinder>;
   collision_matrix[GEOM_SPHERE][GEOM_CONVEX16]            = &ShapeShapeCollide<Sphere, ConvexBase16>;
   collision_matrix[GEOM_SPHERE][GEOM_CONVEX32]            = &ShapeShapeCollide<Sphere, ConvexBase32>;
@@ -313,6 +315,7 @@ CollisionFunctionMatrix::CollisionFunctionMatrix() {
   collision_matrix[GEOM_ELLIPSOID][GEOM_SPHERE]           = &ShapeShapeCollide<Ellipsoid, Sphere>;
   collision_matrix[GEOM_ELLIPSOID][GEOM_CAPSULE]          = &ShapeShapeCollide<Ellipsoid, Capsule>;
   collision_matrix[GEOM_ELLIPSOID][GEOM_CONE]             = &ShapeShapeCollide<Ellipsoid, Cone>;
+  collision_matrix[GEOM_ELLIPSOID][GEOM_TRUNCATED_CONE]   = &ShapeShapeCollide<Ellipsoid, TruncatedCone>;
   collision_matrix[GEOM_ELLIPSOID][GEOM_CYLINDER]         = &ShapeShapeCollide<Ellipsoid, Cylinder>;
   collision_matrix[GEOM_ELLIPSOID][GEOM_CONVEX16]         = &ShapeShapeCollide<Ellipsoid, ConvexBase16>;
   collision_matrix[GEOM_ELLIPSOID][GEOM_CONVEX32]         = &ShapeShapeCollide<Ellipsoid, ConvexBase32>;
@@ -325,6 +328,7 @@ CollisionFunctionMatrix::CollisionFunctionMatrix() {
   collision_matrix[GEOM_CAPSULE][GEOM_SPHERE]             = &ShapeShapeCollide<Capsule, Sphere>;
   collision_matrix[GEOM_CAPSULE][GEOM_CAPSULE]            = &ShapeShapeCollide<Capsule, Capsule>;
   collision_matrix[GEOM_CAPSULE][GEOM_CONE]               = &ShapeShapeCollide<Capsule, Cone>;
+  collision_matrix[GEOM_CAPSULE][GEOM_TRUNCATED_CONE]     = &ShapeShapeCollide<Capsule, TruncatedCone>;
   collision_matrix[GEOM_CAPSULE][GEOM_CYLINDER]           = &ShapeShapeCollide<Capsule, Cylinder>;
   collision_matrix[GEOM_CAPSULE][GEOM_CONVEX16]           = &ShapeShapeCollide<Capsule, ConvexBase16>;
   collision_matrix[GEOM_CAPSULE][GEOM_CONVEX32]           = &ShapeShapeCollide<Capsule, ConvexBase32>;
@@ -337,6 +341,7 @@ CollisionFunctionMatrix::CollisionFunctionMatrix() {
   collision_matrix[GEOM_CONE][GEOM_SPHERE]                = &ShapeShapeCollide<Cone, Sphere>;
   collision_matrix[GEOM_CONE][GEOM_CAPSULE]               = &ShapeShapeCollide<Cone, Capsule>;
   collision_matrix[GEOM_CONE][GEOM_CONE]                  = &ShapeShapeCollide<Cone, Cone>;
+  collision_matrix[GEOM_CONE][GEOM_TRUNCATED_CONE]        = &ShapeShapeCollide<Cone, TruncatedCone>;
   collision_matrix[GEOM_CONE][GEOM_CYLINDER]              = &ShapeShapeCollide<Cone, Cylinder>;
   collision_matrix[GEOM_CONE][GEOM_CONVEX16]              = &ShapeShapeCollide<Cone, ConvexBase16>;
   collision_matrix[GEOM_CONE][GEOM_CONVEX32]              = &ShapeShapeCollide<Cone, ConvexBase32>;
@@ -345,10 +350,24 @@ CollisionFunctionMatrix::CollisionFunctionMatrix() {
   collision_matrix[GEOM_CONE][GEOM_ELLIPSOID]             = &ShapeShapeCollide<Cone, Ellipsoid>;
   collision_matrix[GEOM_CONE][GEOM_TRIANGLE]              = &ShapeShapeCollide<Cone, TriangleP>;
 
+  collision_matrix[GEOM_TRUNCATED_CONE][GEOM_BOX]         = &ShapeShapeCollide<TruncatedCone, Box>;
+  collision_matrix[GEOM_TRUNCATED_CONE][GEOM_SPHERE]      = &ShapeShapeCollide<TruncatedCone, Sphere>;
+  collision_matrix[GEOM_TRUNCATED_CONE][GEOM_CAPSULE]     = &ShapeShapeCollide<TruncatedCone, Capsule>;
+  collision_matrix[GEOM_TRUNCATED_CONE][GEOM_CONE]        = &ShapeShapeCollide<TruncatedCone, Cone>;
+  collision_matrix[GEOM_TRUNCATED_CONE][GEOM_TRUNCATED_CONE] = &ShapeShapeCollide<TruncatedCone, TruncatedCone>;
+  collision_matrix[GEOM_TRUNCATED_CONE][GEOM_CYLINDER]    = &ShapeShapeCollide<TruncatedCone, Cylinder>;
+  collision_matrix[GEOM_TRUNCATED_CONE][GEOM_CONVEX16]    = &ShapeShapeCollide<TruncatedCone, ConvexBase16>;
+  collision_matrix[GEOM_TRUNCATED_CONE][GEOM_CONVEX32]    = &ShapeShapeCollide<TruncatedCone, ConvexBase32>;
+  collision_matrix[GEOM_TRUNCATED_CONE][GEOM_PLANE]       = &ShapeShapeCollide<TruncatedCone, Plane>;
+  collision_matrix[GEOM_TRUNCATED_CONE][GEOM_HALFSPACE]   = &ShapeShapeCollide<TruncatedCone, Halfspace>;
+  collision_matrix[GEOM_TRUNCATED_CONE][GEOM_ELLIPSOID]   = &ShapeShapeCollide<TruncatedCone, Ellipsoid>;
+  collision_matrix[GEOM_TRUNCATED_CONE][GEOM_TRIANGLE]    = &ShapeShapeCollide<TruncatedCone, TriangleP>;
+
   collision_matrix[GEOM_CYLINDER][GEOM_BOX]               = &ShapeShapeCollide<Cylinder, Box>;
   collision_matrix[GEOM_CYLINDER][GEOM_SPHERE]            = &ShapeShapeCollide<Cylinder, Sphere>;
   collision_matrix[GEOM_CYLINDER][GEOM_CAPSULE]           = &ShapeShapeCollide<Cylinder, Capsule>;
   collision_matrix[GEOM_CYLINDER][GEOM_CONE]              = &ShapeShapeCollide<Cylinder, Cone>;
+  collision_matrix[GEOM_CYLINDER][GEOM_TRUNCATED_CONE]    = &ShapeShapeCollide<Cylinder, TruncatedCone>;
   collision_matrix[GEOM_CYLINDER][GEOM_CYLINDER]          = &ShapeShapeCollide<Cylinder, Cylinder>;
   collision_matrix[GEOM_CYLINDER][GEOM_CONVEX16]          = &ShapeShapeCollide<Cylinder, ConvexBase16>;
   collision_matrix[GEOM_CYLINDER][GEOM_CONVEX32]          = &ShapeShapeCollide<Cylinder, ConvexBase32>;
@@ -361,6 +380,7 @@ CollisionFunctionMatrix::CollisionFunctionMatrix() {
   collision_matrix[GEOM_CONVEX16][GEOM_SPHERE]            = &ShapeShapeCollide<ConvexBase16, Sphere>;
   collision_matrix[GEOM_CONVEX16][GEOM_CAPSULE]           = &ShapeShapeCollide<ConvexBase16, Capsule>;
   collision_matrix[GEOM_CONVEX16][GEOM_CONE]              = &ShapeShapeCollide<ConvexBase16, Cone>;
+  collision_matrix[GEOM_CONVEX16][GEOM_TRUNCATED_CONE]    = &ShapeShapeCollide<ConvexBase16, TruncatedCone>;
   collision_matrix[GEOM_CONVEX16][GEOM_CYLINDER]          = &ShapeShapeCollide<ConvexBase16, Cylinder>;
   collision_matrix[GEOM_CONVEX16][GEOM_CONVEX16]          = &ShapeShapeCollide<ConvexBase16, ConvexBase16>;
   collision_matrix[GEOM_CONVEX16][GEOM_CONVEX32]          = &ShapeShapeCollide<ConvexBase16, ConvexBase32>;
@@ -373,6 +393,7 @@ CollisionFunctionMatrix::CollisionFunctionMatrix() {
   collision_matrix[GEOM_CONVEX32][GEOM_SPHERE]            = &ShapeShapeCollide<ConvexBase32, Sphere>;
   collision_matrix[GEOM_CONVEX32][GEOM_CAPSULE]           = &ShapeShapeCollide<ConvexBase32, Capsule>;
   collision_matrix[GEOM_CONVEX32][GEOM_CONE]              = &ShapeShapeCollide<ConvexBase32, Cone>;
+  collision_matrix[GEOM_CONVEX32][GEOM_TRUNCATED_CONE]    = &ShapeShapeCollide<ConvexBase32, TruncatedCone>;
   collision_matrix[GEOM_CONVEX32][GEOM_CYLINDER]          = &ShapeShapeCollide<ConvexBase32, Cylinder>;
   collision_matrix[GEOM_CONVEX32][GEOM_CONVEX16]          = &ShapeShapeCollide<ConvexBase32, ConvexBase16>;
   collision_matrix[GEOM_CONVEX32][GEOM_CONVEX32]          = &ShapeShapeCollide<ConvexBase32, ConvexBase32>;
@@ -385,6 +406,7 @@ CollisionFunctionMatrix::CollisionFunctionMatrix() {
   collision_matrix[GEOM_PLANE][GEOM_SPHERE]               = &ShapeShapeCollide<Plane, Sphere>;
   collision_matrix[GEOM_PLANE][GEOM_CAPSULE]              = &ShapeShapeCollide<Plane, Capsule>;
   collision_matrix[GEOM_PLANE][GEOM_CONE]                 = &ShapeShapeCollide<Plane, Cone>;
+  collision_matrix[GEOM_PLANE][GEOM_TRUNCATED_CONE]       = &ShapeShapeCollide<Plane, TruncatedCone>;
   collision_matrix[GEOM_PLANE][GEOM_CYLINDER]             = &ShapeShapeCollide<Plane, Cylinder>;
   collision_matrix[GEOM_PLANE][GEOM_CONVEX16]             = &ShapeShapeCollide<Plane, ConvexBase16>;
   collision_matrix[GEOM_PLANE][GEOM_CONVEX32]             = &ShapeShapeCollide<Plane, ConvexBase32>;
@@ -397,6 +419,7 @@ CollisionFunctionMatrix::CollisionFunctionMatrix() {
   collision_matrix[GEOM_HALFSPACE][GEOM_SPHERE]           = &ShapeShapeCollide<Halfspace, Sphere>;
   collision_matrix[GEOM_HALFSPACE][GEOM_CAPSULE]          = &ShapeShapeCollide<Halfspace, Capsule>;
   collision_matrix[GEOM_HALFSPACE][GEOM_CONE]             = &ShapeShapeCollide<Halfspace, Cone>;
+  collision_matrix[GEOM_HALFSPACE][GEOM_TRUNCATED_CONE]   = &ShapeShapeCollide<Halfspace, TruncatedCone>;
   collision_matrix[GEOM_HALFSPACE][GEOM_CYLINDER]         = &ShapeShapeCollide<Halfspace, Cylinder>;
   collision_matrix[GEOM_HALFSPACE][GEOM_CONVEX16]         = &ShapeShapeCollide<Halfspace, ConvexBase16>;
   collision_matrix[GEOM_HALFSPACE][GEOM_CONVEX32]         = &ShapeShapeCollide<Halfspace, ConvexBase32>;
@@ -409,6 +432,7 @@ CollisionFunctionMatrix::CollisionFunctionMatrix() {
   collision_matrix[GEOM_TRIANGLE][GEOM_SPHERE]            = &ShapeShapeCollide<TriangleP, Sphere>;
   collision_matrix[GEOM_TRIANGLE][GEOM_CAPSULE]           = &ShapeShapeCollide<TriangleP, Capsule>;
   collision_matrix[GEOM_TRIANGLE][GEOM_CONE]              = &ShapeShapeCollide<TriangleP, Cone>;
+  collision_matrix[GEOM_TRIANGLE][GEOM_TRUNCATED_CONE]    = &ShapeShapeCollide<TriangleP, TruncatedCone>;
   collision_matrix[GEOM_TRIANGLE][GEOM_CYLINDER]          = &ShapeShapeCollide<TriangleP, Cylinder>;
   collision_matrix[GEOM_TRIANGLE][GEOM_CONVEX16]          = &ShapeShapeCollide<TriangleP, ConvexBase16>;
   collision_matrix[GEOM_TRIANGLE][GEOM_CONVEX32]          = &ShapeShapeCollide<TriangleP, ConvexBase32>;
@@ -421,6 +445,7 @@ CollisionFunctionMatrix::CollisionFunctionMatrix() {
   collision_matrix[BV_AABB][GEOM_SPHERE]                  = &BVHShapeCollider<AABB, Sphere>::collide;
   collision_matrix[BV_AABB][GEOM_CAPSULE]                 = &BVHShapeCollider<AABB, Capsule>::collide;
   collision_matrix[BV_AABB][GEOM_CONE]                    = &BVHShapeCollider<AABB, Cone>::collide;
+  collision_matrix[BV_AABB][GEOM_TRUNCATED_CONE]          = &BVHShapeCollider<AABB, TruncatedCone>::collide;
   collision_matrix[BV_AABB][GEOM_CYLINDER]                = &BVHShapeCollider<AABB, Cylinder>::collide;
   collision_matrix[BV_AABB][GEOM_CONVEX16]                = &BVHShapeCollider<AABB, ConvexBase16>::collide;
   collision_matrix[BV_AABB][GEOM_CONVEX32]                = &BVHShapeCollider<AABB, ConvexBase32>::collide;
@@ -432,6 +457,7 @@ CollisionFunctionMatrix::CollisionFunctionMatrix() {
   collision_matrix[BV_OBB][GEOM_SPHERE]                   = &BVHShapeCollider<OBB, Sphere>::collide;
   collision_matrix[BV_OBB][GEOM_CAPSULE]                  = &BVHShapeCollider<OBB, Capsule>::collide;
   collision_matrix[BV_OBB][GEOM_CONE]                     = &BVHShapeCollider<OBB, Cone>::collide;
+  collision_matrix[BV_OBB][GEOM_TRUNCATED_CONE]           = &BVHShapeCollider<OBB, TruncatedCone>::collide;
   collision_matrix[BV_OBB][GEOM_CYLINDER]                 = &BVHShapeCollider<OBB, Cylinder>::collide;
   collision_matrix[BV_OBB][GEOM_CONVEX16]                 = &BVHShapeCollider<OBB, ConvexBase16>::collide;
   collision_matrix[BV_OBB][GEOM_CONVEX32]                 = &BVHShapeCollider<OBB, ConvexBase32>::collide;
@@ -443,6 +469,7 @@ CollisionFunctionMatrix::CollisionFunctionMatrix() {
   collision_matrix[BV_RSS][GEOM_SPHERE]                   = &BVHShapeCollider<RSS, Sphere>::collide;
   collision_matrix[BV_RSS][GEOM_CAPSULE]                  = &BVHShapeCollider<RSS, Capsule>::collide;
   collision_matrix[BV_RSS][GEOM_CONE]                     = &BVHShapeCollider<RSS, Cone>::collide;
+  collision_matrix[BV_RSS][GEOM_TRUNCATED_CONE]           = &BVHShapeCollider<RSS, TruncatedCone>::collide;
   collision_matrix[BV_RSS][GEOM_CYLINDER]                 = &BVHShapeCollider<RSS, Cylinder>::collide;
   collision_matrix[BV_RSS][GEOM_CONVEX16]                 = &BVHShapeCollider<RSS, ConvexBase16>::collide;
   collision_matrix[BV_RSS][GEOM_CONVEX32]                 = &BVHShapeCollider<RSS, ConvexBase32>::collide;
@@ -454,6 +481,7 @@ CollisionFunctionMatrix::CollisionFunctionMatrix() {
   collision_matrix[BV_KDOP16][GEOM_SPHERE]                = &BVHShapeCollider<KDOP<16>, Sphere>::collide;
   collision_matrix[BV_KDOP16][GEOM_CAPSULE]               = &BVHShapeCollider<KDOP<16>, Capsule>::collide;
   collision_matrix[BV_KDOP16][GEOM_CONE]                  = &BVHShapeCollider<KDOP<16>, Cone>::collide;
+  collision_matrix[BV_KDOP16][GEOM_TRUNCATED_CONE]        = &BVHShapeCollider<KDOP<16>, TruncatedCone>::collide;
   collision_matrix[BV_KDOP16][GEOM_CYLINDER]              = &BVHShapeCollider<KDOP<16>, Cylinder>::collide;
   collision_matrix[BV_KDOP16][GEOM_CONVEX16]              = &BVHShapeCollider<KDOP<16>, ConvexBase16>::collide;
   collision_matrix[BV_KDOP16][GEOM_CONVEX32]              = &BVHShapeCollider<KDOP<16>, ConvexBase32>::collide;
@@ -465,6 +493,7 @@ CollisionFunctionMatrix::CollisionFunctionMatrix() {
   collision_matrix[BV_KDOP18][GEOM_SPHERE]                = &BVHShapeCollider<KDOP<18>, Sphere>::collide;
   collision_matrix[BV_KDOP18][GEOM_CAPSULE]               = &BVHShapeCollider<KDOP<18>, Capsule>::collide;
   collision_matrix[BV_KDOP18][GEOM_CONE]                  = &BVHShapeCollider<KDOP<18>, Cone>::collide;
+  collision_matrix[BV_KDOP18][GEOM_TRUNCATED_CONE]        = &BVHShapeCollider<KDOP<18>, TruncatedCone>::collide;
   collision_matrix[BV_KDOP18][GEOM_CYLINDER]              = &BVHShapeCollider<KDOP<18>, Cylinder>::collide;
   collision_matrix[BV_KDOP18][GEOM_CONVEX16]              = &BVHShapeCollider<KDOP<18>, ConvexBase16>::collide;
   collision_matrix[BV_KDOP18][GEOM_CONVEX32]              = &BVHShapeCollider<KDOP<18>, ConvexBase32>::collide;
@@ -476,6 +505,7 @@ CollisionFunctionMatrix::CollisionFunctionMatrix() {
   collision_matrix[BV_KDOP24][GEOM_SPHERE]                = &BVHShapeCollider<KDOP<24>, Sphere>::collide;
   collision_matrix[BV_KDOP24][GEOM_CAPSULE]               = &BVHShapeCollider<KDOP<24>, Capsule>::collide;
   collision_matrix[BV_KDOP24][GEOM_CONE]                  = &BVHShapeCollider<KDOP<24>, Cone>::collide;
+  collision_matrix[BV_KDOP24][GEOM_TRUNCATED_CONE]        = &BVHShapeCollider<KDOP<24>, TruncatedCone>::collide;
   collision_matrix[BV_KDOP24][GEOM_CYLINDER]              = &BVHShapeCollider<KDOP<24>, Cylinder>::collide;
   collision_matrix[BV_KDOP24][GEOM_CONVEX16]              = &BVHShapeCollider<KDOP<24>, ConvexBase16>::collide;
   collision_matrix[BV_KDOP24][GEOM_CONVEX32]              = &BVHShapeCollider<KDOP<24>, ConvexBase32>::collide;
@@ -487,6 +517,7 @@ CollisionFunctionMatrix::CollisionFunctionMatrix() {
   collision_matrix[BV_kIOS][GEOM_SPHERE]                  = &BVHShapeCollider<kIOS, Sphere>::collide;
   collision_matrix[BV_kIOS][GEOM_CAPSULE]                 = &BVHShapeCollider<kIOS, Capsule>::collide;
   collision_matrix[BV_kIOS][GEOM_CONE]                    = &BVHShapeCollider<kIOS, Cone>::collide;
+  collision_matrix[BV_kIOS][GEOM_TRUNCATED_CONE]          = &BVHShapeCollider<kIOS, TruncatedCone>::collide;
   collision_matrix[BV_kIOS][GEOM_CYLINDER]                = &BVHShapeCollider<kIOS, Cylinder>::collide;
   collision_matrix[BV_kIOS][GEOM_CONVEX16]                = &BVHShapeCollider<kIOS, ConvexBase16>::collide;
   collision_matrix[BV_kIOS][GEOM_CONVEX32]                = &BVHShapeCollider<kIOS, ConvexBase32>::collide;
@@ -498,6 +529,7 @@ CollisionFunctionMatrix::CollisionFunctionMatrix() {
   collision_matrix[BV_OBBRSS][GEOM_SPHERE]                = &BVHShapeCollider<OBBRSS, Sphere>::collide;
   collision_matrix[BV_OBBRSS][GEOM_CAPSULE]               = &BVHShapeCollider<OBBRSS, Capsule>::collide;
   collision_matrix[BV_OBBRSS][GEOM_CONE]                  = &BVHShapeCollider<OBBRSS, Cone>::collide;
+  collision_matrix[BV_OBBRSS][GEOM_TRUNCATED_CONE]        = &BVHShapeCollider<OBBRSS, TruncatedCone>::collide;
   collision_matrix[BV_OBBRSS][GEOM_CYLINDER]              = &BVHShapeCollider<OBBRSS, Cylinder>::collide;
   collision_matrix[BV_OBBRSS][GEOM_CONVEX16]              = &BVHShapeCollider<OBBRSS, ConvexBase16>::collide;
   collision_matrix[BV_OBBRSS][GEOM_CONVEX32]              = &BVHShapeCollider<OBBRSS, ConvexBase32>::collide;
@@ -509,6 +541,7 @@ CollisionFunctionMatrix::CollisionFunctionMatrix() {
   collision_matrix[HF_AABB][GEOM_SPHERE]                  = &HeightFieldShapeCollider<AABB, Sphere>::collide;
   collision_matrix[HF_AABB][GEOM_CAPSULE]                 = &HeightFieldShapeCollider<AABB, Capsule>::collide;
   collision_matrix[HF_AABB][GEOM_CONE]                    = &HeightFieldShapeCollider<AABB, Cone>::collide;
+  collision_matrix[HF_AABB][GEOM_TRUNCATED_CONE]          = &HeightFieldShapeCollider<AABB, TruncatedCone>::collide;
   collision_matrix[HF_AABB][GEOM_CYLINDER]                = &HeightFieldShapeCollider<AABB, Cylinder>::collide;
   collision_matrix[HF_AABB][GEOM_CONVEX16]                = &HeightFieldShapeCollider<AABB, ConvexBase16>::collide;
   collision_matrix[HF_AABB][GEOM_CONVEX32]                = &HeightFieldShapeCollider<AABB, ConvexBase32>::collide;
@@ -520,6 +553,7 @@ CollisionFunctionMatrix::CollisionFunctionMatrix() {
   collision_matrix[HF_OBBRSS][GEOM_SPHERE]                = &HeightFieldShapeCollider<OBBRSS, Sphere>::collide;
   collision_matrix[HF_OBBRSS][GEOM_CAPSULE]               = &HeightFieldShapeCollider<OBBRSS, Capsule>::collide;
   collision_matrix[HF_OBBRSS][GEOM_CONE]                  = &HeightFieldShapeCollider<OBBRSS, Cone>::collide;
+  collision_matrix[HF_OBBRSS][GEOM_TRUNCATED_CONE]        = &HeightFieldShapeCollider<OBBRSS, TruncatedCone>::collide;
   collision_matrix[HF_OBBRSS][GEOM_CYLINDER]              = &HeightFieldShapeCollider<OBBRSS, Cylinder>::collide;
   collision_matrix[HF_OBBRSS][GEOM_CONVEX16]              = &HeightFieldShapeCollider<OBBRSS, ConvexBase16>::collide;
   collision_matrix[HF_OBBRSS][GEOM_CONVEX32]              = &HeightFieldShapeCollider<OBBRSS, ConvexBase32>::collide;
@@ -541,6 +575,7 @@ CollisionFunctionMatrix::CollisionFunctionMatrix() {
   collision_matrix[GEOM_OCTREE][GEOM_SPHERE]              = &OctreeCollide<OcTree, Sphere>;
   collision_matrix[GEOM_OCTREE][GEOM_CAPSULE]             = &OctreeCollide<OcTree, Capsule>;
   collision_matrix[GEOM_OCTREE][GEOM_CONE]                = &OctreeCollide<OcTree, Cone>;
+  collision_matrix[GEOM_OCTREE][GEOM_TRUNCATED_CONE]      = &OctreeCollide<OcTree, TruncatedCone>;
   collision_matrix[GEOM_OCTREE][GEOM_CYLINDER]            = &OctreeCollide<OcTree, Cylinder>;
   collision_matrix[GEOM_OCTREE][GEOM_CONVEX16]            = &OctreeCollide<OcTree, ConvexBase16>;
   collision_matrix[GEOM_OCTREE][GEOM_CONVEX32]            = &OctreeCollide<OcTree, ConvexBase32>;
@@ -552,6 +587,7 @@ CollisionFunctionMatrix::CollisionFunctionMatrix() {
   collision_matrix[GEOM_SPHERE][GEOM_OCTREE]              = &OctreeCollide<Sphere, OcTree>;
   collision_matrix[GEOM_CAPSULE][GEOM_OCTREE]             = &OctreeCollide<Capsule, OcTree>;
   collision_matrix[GEOM_CONE][GEOM_OCTREE]                = &OctreeCollide<Cone, OcTree>;
+  collision_matrix[GEOM_TRUNCATED_CONE][GEOM_OCTREE]      = &OctreeCollide<TruncatedCone, OcTree>;
   collision_matrix[GEOM_CYLINDER][GEOM_OCTREE]            = &OctreeCollide<Cylinder, OcTree>;
   collision_matrix[GEOM_CONVEX16][GEOM_OCTREE]            = &OctreeCollide<ConvexBase16, OcTree>;
   collision_matrix[GEOM_CONVEX32][GEOM_OCTREE]            = &OctreeCollide<ConvexBase32, OcTree>;
